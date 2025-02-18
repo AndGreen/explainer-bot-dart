@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:airtable_crud/airtable_plugin.dart';
 import 'package:openai_dart/openai_dart.dart';
+import 'package:shelf/shelf.dart' as shelf;
+import 'package:shelf/shelf_io.dart' as io;
 import 'package:televerse/televerse.dart';
 
 import 'constants.dart';
@@ -13,7 +15,13 @@ final airtableApiKey = Platform.environment['AIRTABLE_TOKEN'] ?? '';
 final airtableBaseId = Platform.environment['AIRTABLE_BASE_ID'] ?? '';
 
 void main(List<String> arguments) async {
-  final server = await HttpServer.bind(InternetAddress.anyIPv4, 8080);
+  final handler = const shelf.Pipeline()
+      .addMiddleware(shelf.logRequests())
+      .addHandler((request) {
+        return shelf.Response.ok('OK');
+      });
+
+  final server = await io.serve(handler, InternetAddress.anyIPv4, 8080);
   final webhook = Webhook(server, url: domain, shouldSetWebhook: true);
   final bot = Bot(token, fetcher: webhook);
   final openaiClient = OpenAIClient(apiKey: openaiApiKey);
