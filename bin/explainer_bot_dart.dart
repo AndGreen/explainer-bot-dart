@@ -28,7 +28,7 @@ void main(List<String> arguments) async {
       'Request Date': DateTime.now().toIso8601String(),
       'Full Name':
           '${ctx.message?.from?.firstName} ${ctx.message?.from?.lastName}',
-      'Username': ctx.message?.from?.id.toString() ?? '',
+      'Username': ctx.message?.from?.username.toString() ?? '',
     });
 
     final msg = await ctx.reply('...');
