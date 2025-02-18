@@ -9,6 +9,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "80.0.0"
+  airtable_crud:
+    dependency: "direct main"
+    description:
+      name: airtable_crud
+      sha256: "1dcff4f918e3a79d584df7e0304b0e3b8527ae41c380e39c3ff0e4f507630d6d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.3"
   analyzer:
     dependency: transitive
     description:

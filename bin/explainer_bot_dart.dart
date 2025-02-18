@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:airtable_crud/airtable_plugin.dart';
 import 'package:openai_dart/openai_dart.dart';
 import 'package:televerse/televerse.dart';
 
@@ -7,22 +8,32 @@ import 'constants.dart';
 
 final domain = Platform.environment['PUBLIC_DOMAIN'] ?? '';
 final token = Platform.environment['BOT_TOKEN'] ?? '';
-final openaiApiKey = Platform.environment['OPENAI_API_KEY'];
+final openaiApiKey = Platform.environment['OPENAI_API_KEY'] ?? '';
+final airtableApiKey = Platform.environment['AIRTABLE_TOKEN'] ?? '';
+final airtableBaseId = Platform.environment['AIRTABLE_BASE_ID'] ?? '';
 
 void main(List<String> arguments) async {
   final server = await HttpServer.bind(InternetAddress.anyIPv4, 8080);
   final webhook = Webhook(server, url: domain, shouldSetWebhook: true);
   final bot = Bot(token, fetcher: webhook);
-  final client = OpenAIClient(apiKey: openaiApiKey);
+  final openaiClient = OpenAIClient(apiKey: openaiApiKey);
+  final airtableClient = AirtableCrud(airtableApiKey, airtableBaseId);
 
   bot.command('start', (ctx) async {
     await ctx.reply("Введите слово или фразу, которую вы хотите понять");
   });
 
   bot.onMessage((ctx) async {
+    await airtableClient.createRecord('users', {
+      'Request Date': DateTime.now().toIso8601String(),
+      'Full Name':
+          '${ctx.message?.from?.firstName} ${ctx.message?.from?.lastName}',
+      'Username': ctx.message?.from?.id.toString() ?? '',
+    });
+
     final msg = await ctx.reply('...');
 
-    final res = await client.createChatCompletion(
+    final res = await openaiClient.createChatCompletion(
       request: CreateChatCompletionRequest(
         model: ChatCompletionModel.modelId('gpt-4o-mini'),
         messages: [
