@@ -24,6 +24,8 @@ void main(List<String> arguments) async {
   });
 
   bot.onMessage((ctx) async {
+    final chatId = ID.create(ctx.chat?.id ?? 0);
+
     await airtableClient.createRecord('users', {
       'Request Date': DateTime.now().toIso8601String(),
       'Full Name':
@@ -31,7 +33,7 @@ void main(List<String> arguments) async {
       'Username': ctx.message?.from?.username.toString() ?? '',
     });
 
-    final msg = await ctx.reply('...');
+    final msg = await bot.api.sendMessage(chatId, '...');
 
     final res = await openaiClient.createChatCompletion(
       request: CreateChatCompletionRequest(
@@ -49,7 +51,7 @@ void main(List<String> arguments) async {
     );
 
     await bot.api.editMessageText(
-      ID.create(ctx.chat?.id ?? 0),
+      chatId,
       msg.messageId,
       res.choices.first.message.content ?? '',
     );
