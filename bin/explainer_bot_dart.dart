@@ -19,19 +19,19 @@ void main(List<String> arguments) async {
   final openaiClient = OpenAIClient(apiKey: openaiApiKey);
   final airtableClient = AirtableCrud(airtableApiKey, airtableBaseId);
 
-  bot.command('start', (ctx) async {
-    await ctx.reply("Введите слово или фразу, которую вы хотите понять");
-  });
+  // bot.command('start', (ctx) async {
+  //   await ctx.reply("Введите слово или фразу, которую вы хотите понять");
+  // });
 
   bot.onMessage((ctx) async {
     final chatId = ID.create(ctx.chat?.id ?? 0);
 
-    await airtableClient.createRecord('users', {
-      'Request Date': DateTime.now().toIso8601String(),
-      'Full Name':
-          '${ctx.message?.from?.firstName} ${ctx.message?.from?.lastName}',
-      'Username': ctx.message?.from?.username.toString() ?? '',
-    });
+    // await airtableClient.createRecord('users', {
+    //   'Request Date': DateTime.now().toIso8601String(),
+    //   'Full Name':
+    //       '${ctx.message?.from?.firstName} ${ctx.message?.from?.lastName}',
+    //   'Username': ctx.message?.from?.username.toString() ?? '',
+    // });
 
     final msg = await bot.api.sendMessage(chatId, '...');
 
