@@ -11,6 +11,7 @@ final token = Platform.environment['BOT_TOKEN'] ?? '';
 final openaiApiKey = Platform.environment['OPENAI_API_KEY'] ?? '';
 final airtableApiKey = Platform.environment['AIRTABLE_TOKEN'] ?? '';
 final airtableBaseId = Platform.environment['AIRTABLE_BASE_ID'] ?? '';
+const adminUsername = "andrgreen";
 
 void main(List<String> arguments) async {
   final server = await HttpServer.bind(InternetAddress.anyIPv4, 8080);
@@ -49,12 +50,14 @@ void main(List<String> arguments) async {
       res.choices.first.message.content ?? '',
     );
 
-    await airtableClient.createRecord('users', {
-      'Request Date': DateTime.now().toIso8601String(),
-      'Full Name':
-          '${ctx.message?.from?.firstName} ${ctx.message?.from?.lastName}',
-      'Username': ctx.message?.from?.username.toString() ?? '',
-    });
+    if (ctx.message?.from?.username != adminUsername) {
+      await airtableClient.createRecord('users', {
+        'Request Date': DateTime.now().toIso8601String(),
+        'Full Name':
+            '${ctx.message?.from?.firstName ?? ''} ${ctx.message?.from?.lastName ?? ''}',
+        'Username': ctx.message?.from?.username ?? '',
+      });
+    }
   });
 
   await bot.start();
